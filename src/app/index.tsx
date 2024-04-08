@@ -5,8 +5,8 @@ import {Link} from "expo-router";
 export default function Index() {
   return (
     <View style={styles.container}>
-      <Text>Memory-mobile</Text>
-      <Link href="/test">test</Link>
+      <Text>Memory Mobile</Text>
+      <Link href="/test">Commencer le jeu !</Link>
       <StatusBar style="auto" />
     </View>
   );

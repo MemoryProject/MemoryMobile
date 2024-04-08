@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 export default function Index() {
     return (
         <View style={styles.container}>
-            <Text>Commencez le jeu</Text>
+            <Text>Card.tsx</Text>
             <StatusBar style="auto" />
         </View>
     );
