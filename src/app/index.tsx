@@ -6,7 +6,7 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <Text>Memory Mobile</Text>
-      <Link href="/test">Commencer le jeu !</Link>
+      <Link href="/Memory">Commencer le jeu !</Link>
       <StatusBar style="auto" />
     </View>
   );
