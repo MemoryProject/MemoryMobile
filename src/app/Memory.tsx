@@ -1,16 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, SafeAreaView, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Stack } from "expo-router";
+import { useNavigation } from '@react-navigation/native';
 
 const Memory = () => {
+    const navigation = useNavigation();
     const [cards, setCards] = useState<any>([]);
     const [flippedCards, setFlippedCards] = useState<any>([]);
     const [gameOver, setGameOver] = useState<boolean>(false);
+    const [elapsedTime, setElapsedTime] = useState<number>(0);
+    const [moves, setMoves] = useState<number>(0);
+    const [errors, setErrors] = useState<number>(0);
+    const ImageUrl = 'https://www.pngmart.com/files/13/Pattern-PNG-Transparent.png';
 
     useEffect(() => {
         const newCards = createCards();
         setCards(newCards);
     }, []);
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (!gameOver) {
+            interval = setInterval(() => {
+                setElapsedTime(prevTime => prevTime + 1);
+            }, 1000);
+        } else {
+            // @ts-ignore
+            clearInterval(interval);
+        }
+        return () => clearInterval(interval);
+    }, [gameOver]);
+
+    useEffect(() => {
+        // @ts-ignore
+        if (cards.length > 0 && cards.every(card => card.flipped)) {
+            setGameOver(true);
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            Alert.alert(
+                "Félicitations !",
+                `Vous avez trouvé toutes les paires en ${minutes > 0 ? `${minutes} minutes et ${seconds} secondes` : `${seconds} secondes`} avec ${moves + 1} essais et ${errors} erreurs !`,
+                [
+                    {
+                        text: "OK",
+                        onPress: () => navigation.goBack(),
+                    }
+                ]
+            );
+        }
+    }, [cards]);
 
     useEffect(() => {
         if (flippedCards.length === 2) {
@@ -21,18 +61,12 @@ const Memory = () => {
                     newCards[flippedCards[1].index].flipped = false;
                     setCards(newCards);
                 }, 350);
+                setErrors(errors + 1);
             }
             setFlippedCards([]);
+            setMoves(moves + 1);
         }
     }, [flippedCards]);
-
-    useEffect(() => {
-        // @ts-ignore
-        if (cards.length > 0 && cards.every(card => card.flipped)) {
-            setGameOver(true);
-            Alert.alert("Félicitations !", "Vous avez trouvé toutes les paires !");
-        }
-    }, [cards]);
 
     const handleCardTap = (index: number) => {
         if (cards[index].flipped) {
@@ -70,15 +104,44 @@ const Memory = () => {
     };
 
     return (
-        <View style={styles.container}>
-            {cards.map((card: { content: string, flipped: boolean }, index: number) => (
-                <TouchableOpacity key={index} style={styles.card} onPress={() => handleCardTap(index)}>
-                    <Text style={styles.cardContent}>
-                        {card.flipped ? card.content : ''}
-                    </Text>
-                </TouchableOpacity>
-            ))}
-            <StatusBar style="auto" />
+        <View style={{ flex: 1 }}>
+            <LinearGradient
+                colors={['#797979', '#5A5A5A', '#424242']}
+                style={StyleSheet.absoluteFillObject}
+            >
+                <Image source={{ uri: ImageUrl }}
+                       style={styles.backgroundImage}
+                       resizeMode="cover"
+                />
+                <SafeAreaView style={{ flex: 1 }}>
+                    <Stack.Screen options={{
+                        title: 'Memory Mobile',
+                        headerTintColor: '#E2E2E2',
+                        headerBackTitle: 'Retour',
+                        headerStyle: {
+                            backgroundColor: 'transparent',
+                        },
+                        headerTransparent: true,
+                    }}  />
+                    <View style={styles.statsContainer}>
+                        <Text style={styles.timer}>
+                            ⌛ : {elapsedTime >= 60 ? `${Math.floor(elapsedTime / 60)} min ${elapsedTime % 60} s` : `${elapsedTime} s`}
+                        </Text>
+                        <Text style={styles.timer}>🃏 Essais : {moves}</Text>
+                        <Text style={styles.timer}>❌ : {errors}</Text>
+                    </View>
+                    <View style={styles.cardContainer}>
+                        {cards.map((card: { content: string, flipped: boolean }, index: number) => (
+                            <TouchableOpacity key={index} style={styles.card} onPress={() => handleCardTap(index)}>
+                                <Text style={styles.cardContent}>
+                                    {card.flipped ? card.content : ''}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                    <StatusBar style="auto" />
+                </SafeAreaView>
+            </LinearGradient>
         </View>
     );
 };
@@ -86,11 +149,39 @@ const Memory = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        backgroundColor: '#fff',
+        flexDirection: 'column',
+        backgroundColor: '#4A3A5C',
         alignItems: 'center',
         justifyContent: 'center',
+        padding: 20,
+    },
+    backgroundImage: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        opacity: 0.5,
+    },
+    timer: {
+        color: '#FFEB8A',
+        fontSize: 16,
+        fontWeight: 'bold',
+        padding: 20,
+        alignItems: 'center',
+    },
+    statsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginBottom: 20,
+        alignItems: 'center',
+    },
+    cardContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     card: {
         width: '25%',
@@ -98,12 +189,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         margin: 10,
-        backgroundColor: '#f9f9f9',
+        backgroundColor: '#E2E2E2',
         borderRadius: 5,
     },
     cardContent: {
         fontSize: 30,
     },
 });
-
 export default Memory;
