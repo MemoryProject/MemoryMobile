@@ -1,9 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, SafeAreaView, Image } from 'react-native';
+import {
+    ScrollView,
+    View,
+    Text,
+    TouchableOpacity,
+    StyleSheet,
+    Alert,
+    SafeAreaView,
+    Image,
+    Dimensions
+} from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack } from "expo-router";
 import { useNavigation } from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
 
 const Memory = () => {
     const navigation = useNavigation();
@@ -14,6 +25,10 @@ const Memory = () => {
     const [moves, setMoves] = useState<number>(0);
     const [errors, setErrors] = useState<number>(0);
     const ImageUrl = 'https://www.pngmart.com/files/13/Pattern-PNG-Transparent.png';
+    const route = useRoute();
+    // @ts-ignore
+    const difficulty = route.params.difficulty; // Get the difficulty level from the navigation parameters
+    const cardPairsCount = difficulty === 'easy' ? 8 : difficulty === 'normal' ? 12 : 16;
 
     useEffect(() => {
         const newCards = createCards();
@@ -81,7 +96,7 @@ const Memory = () => {
     };
 
     const createCards = () => {
-        const cardPairs = ['🍎', '🍌', '🍇', '🍓', '🍒', '🍑'];
+        const cardPairs = ['🍎', '🍌', '🍇', '🍓', '🍒', '🍑', '🍐', '🍈', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥒'].slice(0, cardPairsCount); // Get the first `cardPairsCount` elements from the array
         let cards: any[] = [];
 
         cardPairs.forEach((pair) => {
@@ -103,6 +118,8 @@ const Memory = () => {
         return cards;
     };
 
+    // @ts-ignore
+    // @ts-ignore
     return (
         <View style={{ flex: 1 }}>
             <LinearGradient
@@ -130,7 +147,12 @@ const Memory = () => {
                         <Text style={styles.timer}>🃏 Essais : {moves}</Text>
                         <Text style={styles.timer}>❌ : {errors}</Text>
                     </View>
-                    <View style={styles.cardContainer}>
+                    <ScrollView
+                        contentContainerStyle={styles.cardContainer}
+                        minimumZoomScale={0.5} // Minimum zoom scale
+                        maximumZoomScale={2} // Maximum zoom scale
+                        pinchGestureEnabled={true} // Enable pinch to zoom
+                    >
                         {cards.map((card: { content: string, flipped: boolean }, index: number) => (
                             <TouchableOpacity key={index} style={styles.card} onPress={() => handleCardTap(index)}>
                                 <Text style={styles.cardContent}>
@@ -138,13 +160,17 @@ const Memory = () => {
                                 </Text>
                             </TouchableOpacity>
                         ))}
-                    </View>
+                    </ScrollView>
                     <StatusBar style="auto" />
                 </SafeAreaView>
             </LinearGradient>
         </View>
     );
 };
+
+const numCardsPerRow = 5; // Number of cards per row
+const screenWidth = Dimensions.get('window').width; // Get the screen width
+const cardSize = screenWidth / numCardsPerRow;
 
 const styles = StyleSheet.create({
     container: {
@@ -184,11 +210,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     card: {
-        width: '25%',
-        height: '25%',
+        width: cardSize, // Set the card width
+        height: cardSize, // Set the card height
         justifyContent: 'center',
         alignItems: 'center',
-        margin: 10,
+        margin: '1%', // Add margin to separate the cards
         backgroundColor: '#E2E2E2',
         borderRadius: 5,
     },

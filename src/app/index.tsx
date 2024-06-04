@@ -1,12 +1,32 @@
 import { StatusBar } from 'expo-status-bar';
-import {SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Link, Stack} from "expo-router";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'react-native';
+import * as Font from 'expo-font';
 
 const ImageUrl = 'https://www.pngmart.com/files/13/Pattern-PNG-Transparent.png';
+
 export default function Index() {
+
+    const [fontLoaded, setFontLoaded] = useState(false);
+
+    useEffect(() => {
+        async function loadFonts() {
+            try {
+                await Font.loadAsync({
+                    'Hello-Samosa': require('../../assets/fonts/Hello-Samosa.ttf'),
+                });
+                setFontLoaded(true);
+            } catch (error) {
+                console.error(ActivityIndicator, error);
+            }
+        }
+
+        loadFonts();
+    }, []);
+
     return (
         <LinearGradient
             colors={['#797979', '#5A5A5A', '#424242']}
@@ -19,9 +39,17 @@ export default function Index() {
             <Stack.Screen options={{headerShown: false}} />
             <View style={styles.container}>
                 <Text style={styles.title}>Memory <Text style={styles.mobileTitle}>Mobile</Text></Text>
-                <TouchableOpacity style={styles.text}>
-                    <Link style={styles.text} href="/Memory">Commencer le jeu !</Link>
-                </TouchableOpacity>
+                <View>
+                    <TouchableOpacity style={styles.linksContainer}>
+                        <Link style={styles.text} href="/Memory?difficulty=easy">Facile</Link>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.linksContainer}>
+                        <Link style={styles.text} href="/Memory?difficulty=normal">Normal</Link>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.linksContainer}>
+                        <Link style={styles.text} href="/Memory?difficulty=hard">Difficile</Link>
+                    </TouchableOpacity>
+                </View>
                 <StatusBar style="auto" />
             </View>
         </LinearGradient>
@@ -44,22 +72,42 @@ const styles = StyleSheet.create({
     },
     title: {
         color: '#E2E2E2',
-        fontSize: 32,
+        fontSize: 48,
         fontWeight: 'bold',
-        marginBottom: 20,
+        marginBottom: 60,
+        fontFamily: 'Hello-Samosa',
     },
     mobileTitle: {
         color: '#FFEB8A',
-        fontSize: 32,
+        fontSize: 48,
         fontWeight: 'bold',
+        marginBottom: 60,
+        fontFamily: 'Hello-Samosa',
     },
     text: {
         color: '#5A5A5A',
-        fontSize: 16,
+        fontSize: 17,
         fontWeight: 'bold',
         backgroundColor: '#E2E2E2',
         paddingHorizontal: 10,
         paddingVertical: 5,
         borderRadius: 5,
+        marginVertical: 15,
+        textAlign: 'center',
+        flexDirection: 'row',
+        width: '60%',
     },
+    linksContainer: {
+        color: '#5A5A5A',
+        fontSize: 17,
+        fontWeight: 'bold',
+        backgroundColor: '#E2E2E2',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 5,
+        marginVertical: 15,
+        textAlign: 'center',
+        flexDirection: 'row',
+        width: '60%',
+    }
 });
