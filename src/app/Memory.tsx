@@ -26,9 +26,9 @@ const Memory = () => {
     const [errors, setErrors] = useState<number>(0);
     const ImageUrl = 'https://www.pngmart.com/files/13/Pattern-PNG-Transparent.png';
     const route = useRoute();
-    // @ts-ignore
-    const difficulty = route.params.difficulty; // Get the difficulty level from the navigation parameters
+    const difficulty = route.params?.difficulty || 'easy';
     const cardPairsCount = difficulty === 'easy' ? 8 : difficulty === 'normal' ? 12 : 16;
+    const theme = route.params?.theme || 'fruits';
 
     useEffect(() => {
         const newCards = createCards();
@@ -77,6 +77,13 @@ const Memory = () => {
                     setCards(newCards);
                 }, 350);
                 setErrors(errors + 1);
+            } else {
+                setTimeout(() => {
+                    let newCards = [...cards];
+                    newCards[flippedCards[0].index].matched = true;
+                    newCards[flippedCards[1].index].matched = true;
+                    setCards(newCards);
+                }, 10);
             }
             setFlippedCards([]);
             setMoves(moves + 1);
@@ -96,17 +103,37 @@ const Memory = () => {
     };
 
     const createCards = () => {
-        const cardPairs = ['🍎', '🍌', '🍇', '🍓', '🍒', '🍑', '🍐', '🍈', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥒'].slice(0, cardPairsCount); // Get the first `cardPairsCount` elements from the array
+        let cardPairs;
+        switch (theme) {
+            case 'fruits':
+                cardPairs = ['🍎', '🍌', '🍇', '🍓', '🍒', '🍑', '🍐', '🍈', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥒'];
+                break;
+            case 'emoji':
+                cardPairs = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰'];
+                break;
+            case 'animals':
+                cardPairs = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔'];
+                break;
+        }
+        if (Array.isArray(cardPairs)) {
+            cardPairs = cardPairs.slice(0, cardPairsCount);
+        } else {
+            // Handle error here
+            console.error('cardPairs is not an array');
+            cardPairs = []; // default to an empty array if not an array
+        }
         let cards: any[] = [];
 
         cardPairs.forEach((pair) => {
             cards.push({
                 content: pair,
                 flipped: false,
+                matched: false,
             });
             cards.push({
                 content: pair,
                 flipped: false,
+                matched: false,
             });
         });
 
@@ -147,14 +174,9 @@ const Memory = () => {
                         <Text style={styles.timer}>🃏 Essais : {moves}</Text>
                         <Text style={styles.timer}>❌ : {errors}</Text>
                     </View>
-                    <ScrollView
-                        contentContainerStyle={styles.cardContainer}
-                        minimumZoomScale={0.5} // Minimum zoom scale
-                        maximumZoomScale={2} // Maximum zoom scale
-                        pinchGestureEnabled={true} // Enable pinch to zoom
-                    >
-                        {cards.map((card: { content: string, flipped: boolean }, index: number) => (
-                            <TouchableOpacity key={index} style={styles.card} onPress={() => handleCardTap(index)}>
+                    <ScrollView contentContainerStyle={styles.cardContainer}>
+                        {cards.map((card: { content: string, flipped: boolean, matched: boolean }, index: number) => (
+                            <TouchableOpacity key={index} style={[styles.card, card.matched ? styles.matchedCard : null]} onPress={() => handleCardTap(index)}>
                                 <Text style={styles.cardContent}>
                                     {card.flipped ? card.content : ''}
                                 </Text>
@@ -210,16 +232,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     card: {
-        width: cardSize, // Set the card width
-        height: cardSize, // Set the card height
+        width: cardSize,
+        height: cardSize,
         justifyContent: 'center',
         alignItems: 'center',
-        margin: '1%', // Add margin to separate the cards
+        margin: '1%',
         backgroundColor: '#E2E2E2',
-        borderRadius: 5,
+        borderRadius: 15,
     },
     cardContent: {
         fontSize: 30,
+    },
+    matchedCard: {
+        backgroundColor: '#ffefad',
     },
 });
 export default Memory;
