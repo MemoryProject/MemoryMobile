@@ -68,7 +68,7 @@ export default function Index() {
                                 <Picker
                                     selectedValue={theme}
                                     style={ styles.pickerContainer }
-                                    itemStyle={styles.pickerItem} // Ajoutez cette ligne
+                                    itemStyle={styles.pickerItem}
                                     onValueChange={(itemValue, itemIndex) => setTheme(itemValue)}
                                 >
                                     <Picker.Item label="Fruits et légumes" value="fruits" />
