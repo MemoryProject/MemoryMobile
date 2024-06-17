@@ -6,7 +6,7 @@ Memory Mobile est une application de jeu de mémoire développée en React Nativ
   <img src="https://media.discordapp.net/attachments/534786115513614339/1250086038429499584/E798860F-2893-44EA-B6F6-BDD2A6F53E64.jpg?ex=6669a8d9&is=66685759&hm=3bec4dbfe26de0f937e6a0344ffe81e8c56dda4c08e0020a04228d84a8bb867f&=&format=webp&width=671&height=671" alt="Memory Mobile">
 </p>
 
-⚠️ Possibilité d'un problème de chargement du font du titre ainsi que du surlignement et de la flèche à coté de "Choisir un thèmes" ⚠️
+⚠️ Possibilité d'un problème de chargement du font du titre ainsi que du surlignement et de la flèche à coté de "Choisir un thème" ⚠️
 
 ## Installation
 
