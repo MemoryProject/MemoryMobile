@@ -55,11 +55,12 @@ export default function Index() {
                    resizeMode="cover"
             />
             <Stack.Screen options={{headerShown: false}} />
+            <StatusBar barStyle="light-content" />
             <View style={styles.container}>
                 <Text style={styles.title}>Memory <Text style={styles.mobileTitle}>Mobile</Text></Text>
                 <View>
                     <TouchableOpacity onPress={togglePicker}>
-                        <Text style={styles.buttonText}>Choisir un thème</Text>
+                        <Text style={styles.buttonText}>➜ Choisir un thème</Text>
                     </TouchableOpacity>
                     <Modal visible={isPickerVisible} transparent={true}>
                         <View style={styles.overlay} />
@@ -91,7 +92,6 @@ export default function Index() {
                         <Link style={styles.text} href={`/Memory?difficulty=hard&theme=${theme}`}>Difficile</Link>
                     </TouchableOpacity>
                 </View>
-                <StatusBar barStyle="light-content" />
             </View>
         </LinearGradient>
     );
@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
         fontSize: 17,
         textAlign: 'center',
         fontWeight: 'bold',
+        textDecorationLine: 'underline',
     },
     overlay: {
         position: 'absolute',
